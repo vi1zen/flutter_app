@@ -2,6 +2,10 @@
 
 A new Flutter application.
 
+![pic1](https://github.com/vi1zen/flutter_app/blob/master/snapshot/flutter_home_page_snapshot.png)
+
+![pic2](https://github.com/vi1zen/flutter_app/blob/master/snapshot/flutter_webview_snapshot.png)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
