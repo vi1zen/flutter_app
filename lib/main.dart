@@ -38,7 +38,7 @@ class RandomWords extends StatefulWidget{
 class RandomWordsStates extends State<RandomWords>{
   final wordsList = new List<AndroidInfo>();//数据源
   final wordsFont = const TextStyle(fontSize: 18.0);
-
+  bool isRefresh = false;
   @override
   void initState() {
     super.initState();
@@ -47,9 +47,10 @@ class RandomWordsStates extends State<RandomWords>{
 
   //从网络获取数据
   void getResponseFromUrl() async {
+    isRefresh = true;
+    setState(() {});
     final dio = new Dio();
     Response response = await dio.get("http://gank.io/api/random/data/Android/20");
-//    print(response.data.toString());
 
     AndroidNewsBean androidNewsBean = AndroidNewsBean(response.data);
     final list = androidNewsBean.results;
@@ -58,7 +59,10 @@ class RandomWordsStates extends State<RandomWords>{
     }
     setState(() {
       wordsList.clear();
-      wordsList.addAll(list);
+      if(!androidNewsBean.error){
+        wordsList.addAll(list);
+      }
+      isRefresh = false;
     });
   }
 
@@ -69,21 +73,42 @@ class RandomWordsStates extends State<RandomWords>{
         title: new Text("Gank.io by Flutter"),
         actions: <Widget>[new IconButton(icon: new Icon(Icons.refresh), onPressed: getResponseFromUrl)],
       ),
-      body: buildWords(),
+      body: buildListView(),
     );
   }
 
-  Widget buildWords(){
-    return new Container(
-      child:  new ListView.builder(
-        itemCount: wordsList.length,
-          padding: const EdgeInsets.all(8.0),
-          itemBuilder: (context,i){
-            return buildRow(wordsList[i],i);
-          },
-        )
-    );
-
+  Widget buildListView(){
+    if(isRefresh){
+      return new GestureDetector(
+        child: new Center(
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.black87),),Text("正在加载...")],
+          ),
+        ),
+        onTap: getResponseFromUrl,
+      );
+    }else if(wordsList.isEmpty){
+      return new GestureDetector(
+        child: new Center(
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[Icon(Icons.error,size: 50.0,),Text("Oops,服务器错误!")],
+          ),
+        ),
+        onTap: getResponseFromUrl,
+      );
+    }else{
+      return new Container(
+          child:  new ListView.builder(
+            itemCount: wordsList.length,
+            padding: const EdgeInsets.all(8.0),
+            itemBuilder: (context,i){
+              return buildRow(wordsList[i],i);
+            },
+          )
+      );
+    }
   }
 
   Widget buildRow(AndroidInfo androidInfo, int index) {
