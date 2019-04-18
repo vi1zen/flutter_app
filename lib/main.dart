@@ -53,7 +53,9 @@ class RandomWordsStates extends State<RandomWords>{
 
     AndroidNewsBean androidNewsBean = AndroidNewsBean(response.data);
     final list = androidNewsBean.results;
-    print(list.toString());
+    for (var value in list) {
+      print(value.toString());
+    }
     setState(() {
       wordsList.clear();
       wordsList.addAll(list);
@@ -65,6 +67,7 @@ class RandomWordsStates extends State<RandomWords>{
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Gank.io by Flutter"),
+        actions: <Widget>[new IconButton(icon: new Icon(Icons.refresh), onPressed: getResponseFromUrl)],
       ),
       body: buildWords(),
     );

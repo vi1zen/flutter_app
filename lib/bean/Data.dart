@@ -45,10 +45,10 @@ class AndroidInfo {
     createdAt = jsonRes['createdAt'];
     desc = jsonRes['desc'];
     publishedAt = jsonRes['publishedAt'];
-    source = jsonRes['source'];
+    source = jsonRes['source'] == null ? "null" : jsonRes['source'];
     type = jsonRes['type'];
     url = jsonRes['url'];
-    who = jsonRes['who'];
+    who = jsonRes['who'] == null ? "null" : jsonRes['who'];
     images = jsonRes['images'] == null ? null : [];
 
     for (var imagesItem in images == null ? [] : jsonRes['images']){
