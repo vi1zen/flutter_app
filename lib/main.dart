@@ -1,180 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_app/bean/Data.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-void main() => runApp(MyApp());
+import 'package:flutter_app/home.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_app/news.dart';
+import 'package:flutter_app/picture.dart';
+
+void main()  {
+  runApp(MyApp());
+    SystemUiOverlayStyle systemUiOverlayStyle =
+    SystemUiOverlayStyle(systemNavigationBarColor: Color(0xFF000000),
+      systemNavigationBarDividerColor: null,
+      statusBarColor: null,
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light);
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        primaryColor: Colors.white
-      ),
-      home: new RandomWords(),
+      home: BottomNavWidget(),
     );
   }
+
 }
 
-class RandomWords extends StatefulWidget{
-
+class BottomNavWidget extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
-    return new RandomWordsStates();
+    return BottomNavState();
   }
 }
-class RandomWordsStates extends State<RandomWords>{
-  final wordsList = new List<AndroidInfo>();//数据源
-  final wordsFont = const TextStyle(fontSize: 18.0);
-  bool isRefresh = false;
-  @override
-  void initState() {
-    super.initState();
-    getResponseFromUrl();
-  }
-
-  //从网络获取数据
-  void getResponseFromUrl() async {
-    isRefresh = true;
-    setState(() {});
-    final dio = new Dio();
-    Response response = await dio.get("http://gank.io/api/random/data/Android/20");
-
-    AndroidNewsBean androidNewsBean = AndroidNewsBean(response.data);
-    final list = androidNewsBean.results;
-    for (var value in list) {
-      print(value.toString());
-    }
-    setState(() {
-      wordsList.clear();
-      if(!androidNewsBean.error){
-        wordsList.addAll(list);
-      }
-      isRefresh = false;
-    });
-  }
+class BottomNavState extends State<BottomNavWidget>{
+  int _selectedIndex = 0;
+  static List<Widget> _widgetOptions = <Widget>[
+    HomePage(),
+    NewsPage(),
+    PicturePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Gank.io by Flutter"),
-        actions: <Widget>[new IconButton(icon: new Icon(Icons.refresh), onPressed: getResponseFromUrl)],
-      ),
-      body: buildListView(),
+    return Scaffold(
+      body: Padding(padding: EdgeInsets.only(top: 20),child:
+      _widgetOptions.elementAt(_selectedIndex),),
+      bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              title: Text("首页")
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.library_books),
+                title: Text("新闻")
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.photo),
+                title: Text("美图")
+            )
+          ],
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,),
     );
   }
 
-  Widget buildListView(){
-    if(isRefresh){
-      return new GestureDetector(
-        child: new Center(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.black87),),Text("正在加载...")],
-          ),
-        ),
-        onTap: getResponseFromUrl,
-      );
-    }else if(wordsList.isEmpty){
-      return new GestureDetector(
-        child: new Center(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[Icon(Icons.error,size: 50.0,),Text("Oops,服务器错误!")],
-          ),
-        ),
-        onTap: getResponseFromUrl,
-      );
-    }else{
-      return new Container(
-          child:  new ListView.builder(
-            itemCount: wordsList.length,
-            padding: const EdgeInsets.all(8.0),
-            itemBuilder: (context,i){
-              return buildRow(wordsList[i],i);
-            },
-          )
-      );
-    }
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
-
-  Widget buildRow(AndroidInfo androidInfo, int index) {
-    return new Dismissible(key: new Key(androidInfo.desc),
-      onDismissed: (direction){
-        setState(() {
-          wordsList.remove(androidInfo);
-        });
-      },
-      child: new GestureDetector(
-        onTap: (){
-          print(androidInfo.desc);
-          Navigator.of(context).push(new MaterialPageRoute(builder: (context){
-            return new Scaffold(
-              appBar: new AppBar(
-                title: new Text(androidInfo.desc),
-              ),
-              body: WebView(
-                initialUrl: androidInfo.url,
-                javascriptMode: JavascriptMode.unrestricted,
-              ),
-            );
-          }
-          ));
-        },
-        child: new Card(
-          elevation: 5.0,
-          child: new Padding(padding: EdgeInsets.all(10.0),
-            child: new Column(
-            children: <Widget>[
-              new Row(
-                children: <Widget>[Padding(
-                  padding: EdgeInsets.only(top: 16.0,bottom: 16.0),
-                ),
-                Expanded(
-                  child: Text(androidInfo.desc,style: new TextStyle(fontWeight: FontWeight.w600),),
-                ),
-                ],
-              ),
-              Image.network(androidInfo.images == null ? "" : androidInfo.images[0]),
-              new Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  new Text(
-                    "发布时间：" + androidInfo.createdAt,
-                    textAlign: TextAlign.right,
-                  ),
-                ],
-              ),
-              new Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  new Text(
-                    "作者:" + androidInfo.who,
-                    textAlign: TextAlign.right,
-                  ),
-                ],
-              ),
-              ],
-          ),
-          ),),
-      ));
-
-
-  }
-
 }

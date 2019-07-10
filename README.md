@@ -2,9 +2,11 @@
 
 A new Flutter application.
 
-![pic1](https://github.com/vi1zen/flutter_app/blob/master/snapshot/flutter_home_page_snapshot.png)
+![pic1](https://github.com/vi1zen/flutter_app/blob/master/snapshot/snapshot_home.png)
 
-![pic2](https://github.com/vi1zen/flutter_app/blob/master/snapshot/flutter_webview_snapshot.png)
+![pic2](https://github.com/vi1zen/flutter_app/blob/master/snapshot/snapshot_picture.png)
+
+![pic3](https://github.com/vi1zen/flutter_app/blob/master/snapshot/flutter_webview_snapshot.png)
 
 ## Getting Started
 
