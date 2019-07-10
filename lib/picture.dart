@@ -10,7 +10,7 @@ class PicturePage extends StatefulWidget{
     return new PicturePageStates();
   }
 }
-class PicturePageStates extends State<PicturePage>{
+class PicturePageStates extends State<PicturePage> with AutomaticKeepAliveClientMixin{
   final wordsList = new List<AndroidInfo>();//数据源
   final wordsFont = const TextStyle(fontSize: 18.0);
   bool isRefresh = false;
@@ -43,6 +43,7 @@ class PicturePageStates extends State<PicturePage>{
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return new Scaffold(
       body: buildListView(),
     );
@@ -114,5 +115,8 @@ class PicturePageStates extends State<PicturePage>{
 
 
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
 }

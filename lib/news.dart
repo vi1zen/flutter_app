@@ -10,7 +10,7 @@ class NewsPage extends StatefulWidget{
     return new NewsPageStates();
   }
 }
-class NewsPageStates extends State<NewsPage>{
+class NewsPageStates extends State<NewsPage> with AutomaticKeepAliveClientMixin{
   final newsList = new List<NewsItemBean>();//数据源
   final wordsFont = const TextStyle(fontSize: 18.0);
   bool isRefresh = false;
@@ -43,6 +43,7 @@ class NewsPageStates extends State<NewsPage>{
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return new Scaffold(
       body: buildListView(),
     );
@@ -136,5 +137,8 @@ class NewsPageStates extends State<NewsPage>{
 
 
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
 }

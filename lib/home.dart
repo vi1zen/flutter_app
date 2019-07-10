@@ -7,16 +7,17 @@ class HomePage extends StatefulWidget{
 
   @override
   State<StatefulWidget> createState() {
-    return new HomePageStates();
+    return HomePageStates();
   }
 }
-class HomePageStates extends State<HomePage>{
+class HomePageStates extends State<HomePage> with AutomaticKeepAliveClientMixin{
   final wordsList = new List<AndroidInfo>();//数据源
   final wordsFont = const TextStyle(fontSize: 18.0);
   bool isRefresh = false;
   @override
   void initState() {
     super.initState();
+    print("HomePage initState ...............");
     getResponseFromUrl();
   }
 
@@ -43,6 +44,7 @@ class HomePageStates extends State<HomePage>{
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return new Scaffold(
       body: buildListView(),
     );
@@ -83,13 +85,7 @@ class HomePageStates extends State<HomePage>{
   }
 
   Widget buildRow(AndroidInfo androidInfo, int index) {
-    return new Dismissible(key: new Key(androidInfo.desc),
-        onDismissed: (direction){
-          setState(() {
-            wordsList.remove(androidInfo);
-          });
-        },
-        child: new GestureDetector(
+    return GestureDetector(
           onTap: (){
             print(androidInfo.desc);
             Navigator.of(context).push(new MaterialPageRoute(builder: (context){
@@ -142,10 +138,12 @@ class HomePageStates extends State<HomePage>{
                   ),
                 ],
               ),
-            ),),
-        ));
-
+            ),)
+    );
 
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
 }
